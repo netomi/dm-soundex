@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 /**
  * Factory for {@link DMSoundexFilter}.
- * 
+ *
  * Create tokens based on Daitch–Mokotoff Soundex phonetic filter.
  * <p>
  * This takes one optional argument:
@@ -53,7 +53,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  *     &lt;filter class="org.netomi.lucene.DMSoundexFilterFactory" inject="true"/&gt;
  *   &lt;/analyzer&gt;
  * &lt;/fieldType&gt;</pre>
- * 
+ *
  * @see DMSoundexFilter
  */
 public class DMSoundexFilterFactory extends TokenFilterFactory {
@@ -61,7 +61,7 @@ public class DMSoundexFilterFactory extends TokenFilterFactory {
   public static final String INJECT = "inject"; // boolean
 
   final boolean inject; //accessed by the test
-  
+
   /** Creates a new PhoneticFilterFactory */
   public DMSoundexFilterFactory(Map<String,String> args) {
     super(args);

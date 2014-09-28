@@ -16,7 +16,6 @@
  */
 package org.netomi.codec;
 
-
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.StringEncoderAbstractTest;
 import org.junit.Assert;
@@ -70,7 +69,8 @@ public class DMSoundexTest extends StringEncoderAbstractTest<DMSoundex> {
         Assert.assertEquals("587400", this.getStringEncoder().soundex("Golubitsa"));
         Assert.assertEquals("746480|794648", this.getStringEncoder().soundex("Przemysl"));
         Assert.assertEquals("746480", this.getStringEncoder().soundex("Pshemeshil"));
-        Assert.assertEquals("944744|944745|944754|944755|945744|945745|945754|945755", this.getStringEncoder().soundex("Rosochowaciec"));
+        Assert.assertEquals("944744|944745|944754|944755|945744|945745|945754|945755",
+                            this.getStringEncoder().soundex("Rosochowaciec"));
         Assert.assertEquals("945744", this.getStringEncoder().soundex("Rosokhovatsets"));
     }
 
@@ -84,7 +84,8 @@ public class DMSoundexTest extends StringEncoderAbstractTest<DMSoundex> {
         Assert.assertEquals("645740", this.getStringEncoder().soundex("Moskowitz"));
         Assert.assertEquals("645740", this.getStringEncoder().soundex("Moskovitz"));
         Assert.assertEquals("154600|145460|454600|445460", this.getStringEncoder().soundex("Jackson"));
-        Assert.assertEquals("154654|154645|154644|145465|145464|454654|454645|454644|445465|445464", this.getStringEncoder().soundex("Jackson-Jackson"));
+        Assert.assertEquals("154654|154645|154644|145465|145464|454654|454645|454644|445465|445464",
+                            this.getStringEncoder().soundex("Jackson-Jackson"));
     }
 
     @Test

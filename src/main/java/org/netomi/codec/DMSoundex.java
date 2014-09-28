@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ public class DMSoundex implements StringEncoder {
     private static final String RESOURCE_FILE = "org/netomi/codec/dmrules.txt";
     private static final String COMMENT = "//";
     private static final String DOUBLE_QUOTE = "\"";
-    
+
     private static final Map<Character, List<Rule>> RULES = new HashMap<Character, List<Rule>>();
     private static final Map<Character, Character> TRANSLATION = new HashMap<Character, Character>();
 
@@ -51,7 +51,7 @@ public class DMSoundex implements StringEncoder {
         final Scanner scanner = new Scanner(rulesIS, CharEncoding.UTF_8);
         RULES.putAll(parseRules(scanner, RESOURCE_FILE));
         scanner.close();
-        
+
         // sort RULES by pattern length in descending order
         for (Map.Entry<Character, List<Rule>> rule : RULES.entrySet()) {
             List<Rule> ruleList = rule.getValue();
@@ -68,7 +68,7 @@ public class DMSoundex implements StringEncoder {
         TRANSLATION.put('á', 'a');
         TRANSLATION.put('â', 'a');
         TRANSLATION.put('ã', 'a');
-        TRANSLATION.put('ä', 'a'); 
+        TRANSLATION.put('ä', 'a');
         TRANSLATION.put('å', 'a');
         TRANSLATION.put('æ', 'a');
         TRANSLATION.put('ç', 'c');
@@ -168,7 +168,8 @@ public class DMSoundex implements StringEncoder {
     @Override
     public Object encode(final Object obj) throws EncoderException {
         if (!(obj instanceof String)) {
-            throw new EncoderException("Parameter supplied to DaitchMokotoffSoundex encode is not of type java.lang.String");
+            throw new EncoderException(
+                    "Parameter supplied to DaitchMokotoffSoundex encode is not of type java.lang.String");
         }
         return encode((String) obj);
     }
@@ -180,14 +181,14 @@ public class DMSoundex implements StringEncoder {
         }
         return soundex(source).split("\\|")[0];
     }
-    
+
     private String cleanup(String input) {
         StringBuilder sb = new StringBuilder();
         for (char ch : input.toCharArray()) {
             if (Character.isWhitespace(ch)) {
                 continue;
             }
-            
+
             ch = Character.toLowerCase(ch);
             if (TRANSLATION.containsKey(ch)) {
                 ch = TRANSLATION.get(ch);
@@ -255,16 +256,16 @@ public class DMSoundex implements StringEncoder {
                             replacementIndex++;
                         }
                     }
-                    
+
                     branches = newSet;
                     index += rule.getPatternLength() - 1;
                     break;
                 }
             }
-            
+
             lastChar = ch;
         }
-        
+
         StringBuilder result = new StringBuilder();
         for (SoundexContext branch : branches) {
             while (branch.sb.length() < 6) {
@@ -282,12 +283,12 @@ public class DMSoundex implements StringEncoder {
     private static final class SoundexContext {
         private StringBuilder sb;
         private String lastReplacement;
-        
+
         protected SoundexContext() {
             sb = new StringBuilder();
             lastReplacement = null;
         }
-        
+
         public SoundexContext createBranch() {
             SoundexContext context = new SoundexContext();
             context.sb.append(sb.toString());
@@ -298,7 +299,7 @@ public class DMSoundex implements StringEncoder {
         public int hashCode() {
             return sb.toString().hashCode();
         }
-        
+
         public boolean equals(Object other) {
             if (this == other) {
                 return true;
@@ -306,7 +307,7 @@ public class DMSoundex implements StringEncoder {
             if (! (other instanceof SoundexContext)) {
                 return false;
             }
-            
+
             return sb.toString().equals(((SoundexContext) other).sb.toString());
         }
 
@@ -324,7 +325,7 @@ public class DMSoundex implements StringEncoder {
         private final String replacementAtStart;
         private final String replacementBeforeVowel;
         private final String replacementDefault;
-        
+
         protected Rule(final String pattern, final String replacementAtStart,
                        final String replacementBeforeVowel, final String replacementDefault) {
             this.pattern = pattern;
@@ -332,7 +333,7 @@ public class DMSoundex implements StringEncoder {
             this.replacementBeforeVowel = replacementBeforeVowel;
             this.replacementDefault = replacementDefault;
         }
-        
+
         public int getPatternLength() {
             return pattern.length();
         }
@@ -360,7 +361,8 @@ public class DMSoundex implements StringEncoder {
         }
 
         public String toString() {
-            return String.format("%s=(%s,%s,%s)", pattern, replacementAtStart, replacementBeforeVowel, replacementDefault);
+            return String.format("%s=(%s,%s,%s)", pattern, replacementAtStart,
+                                 replacementBeforeVowel, replacementDefault);
         }
     }
 }

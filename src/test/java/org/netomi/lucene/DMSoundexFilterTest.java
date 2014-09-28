@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,9 @@ public class DMSoundexFilterTest extends BaseTokenStreamTestCase {
 
     public void testAlgorithms() throws Exception {
         assertAlgorithm(true, "aaa bbb ccc easgasg",
-                new String[] { "aaa", "000000", "bbb", "700000", "ccc", "400000", "450000", "454000", "540000", "545000", "500000", "easgasg", "045450" });
+                new String[] { "aaa", "000000", "bbb", "700000",
+                               "ccc", "400000", "450000", "454000", "540000", "545000", "500000",
+                               "easgasg", "045450" });
 //        assertAlgorithm(false, "aaa bbb ccc easgasg", new String[] { "000000", "700000", "400000", "045450" });
     }
 
