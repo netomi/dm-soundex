@@ -144,6 +144,15 @@ public class DMSoundexTest extends StringEncoderAbstractTest<DMSoundex> {
     }
 
     @Test
+    public void testAccentedCharacterFolding() {
+        Assert.assertEquals("294795", getStringEncoder().soundex("Straßburg"));
+        Assert.assertEquals("294795", getStringEncoder().soundex("Strasburg"));
+
+        Assert.assertEquals("095600", getStringEncoder().soundex("Éregon"));
+        Assert.assertEquals("095600", getStringEncoder().soundex("Eregon"));
+    }
+
+    @Test
     public void testSpecialRomanianCharacters() {
         Assert.assertEquals("364000|464000", this.getStringEncoder().soundex("ţamas")); // t-cedilla
         Assert.assertEquals("364000|464000", this.getStringEncoder().soundex("țamas")); // t-comma

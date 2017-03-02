@@ -34,11 +34,15 @@ import org.apache.commons.codec.StringEncoder;
 public class DMSoundex implements StringEncoder {
 
     private static final String RESOURCE_FILE = "org/netomi/codec/dmrules.txt";
+
     private static final String COMMENT = "//";
     private static final String DOUBLE_QUOTE = "\"";
 
+    private static final String MULTILINE_COMMENT_END = "*/";
+    private static final String MULTILINE_COMMENT_START = "/*";
+
     private static final Map<Character, List<Rule>> RULES = new HashMap<Character, List<Rule>>();
-    private static final Map<Character, Character> TRANSLATION = new HashMap<Character, Character>();
+    private static final Map<Character, Character> FOLDINGS = new HashMap<Character, Character>();
 
     static {
         final InputStream rulesIS =
@@ -49,8 +53,11 @@ public class DMSoundex implements StringEncoder {
         }
 
         final Scanner scanner = new Scanner(rulesIS, CharEncoding.UTF_8);
-        RULES.putAll(parseRules(scanner, RESOURCE_FILE));
-        scanner.close();
+        try {
+            parseRules(scanner, RESOURCE_FILE, RULES, FOLDINGS);
+        } finally {
+            scanner.close();
+        }
 
         // sort RULES by pattern length in descending order
         for (Map.Entry<Character, List<Rule>> rule : RULES.entrySet()) {
@@ -62,95 +69,85 @@ public class DMSoundex implements StringEncoder {
                 }
             });
         }
-
-        TRANSLATION.put('ß', 's');
-        TRANSLATION.put('à', 'a');
-        TRANSLATION.put('á', 'a');
-        TRANSLATION.put('â', 'a');
-        TRANSLATION.put('ã', 'a');
-        TRANSLATION.put('ä', 'a');
-        TRANSLATION.put('å', 'a');
-        TRANSLATION.put('æ', 'a');
-        TRANSLATION.put('ç', 'c');
-        TRANSLATION.put('è', 'e');
-        TRANSLATION.put('é', 'e');
-        TRANSLATION.put('ê', 'e');
-        TRANSLATION.put('ë', 'e');
-        TRANSLATION.put('ì', 'i');
-        TRANSLATION.put('í', 'i');
-        TRANSLATION.put('î', 'i');
-        TRANSLATION.put('ï', 'i');
-        TRANSLATION.put('ð', 'd');
-        TRANSLATION.put('ñ', 'n');
-        TRANSLATION.put('ò', 'o');
-        TRANSLATION.put('ó', 'o');
-        TRANSLATION.put('ô', 'o');
-        TRANSLATION.put('õ', 'o');
-        TRANSLATION.put('ö', 'o');
-        TRANSLATION.put('ø', 'o');
-        TRANSLATION.put('ù', 'u');
-        TRANSLATION.put('ú', 'u');
-        TRANSLATION.put('û', 'u');
-        TRANSLATION.put('ý', 'y');
-        TRANSLATION.put('ý', 'y');
-        TRANSLATION.put('þ', 'b');
-        TRANSLATION.put('ÿ', 'y');
-        TRANSLATION.put('ć', 'c');
-        TRANSLATION.put('ł', 'l');
-        TRANSLATION.put('ś', 's');
-        TRANSLATION.put('ż', 'z');
-        TRANSLATION.put('ź', 'z');
     }
 
-    private static Map<Character, List<Rule>> parseRules(final Scanner scanner, final String location) {
-        final Map<Character, List<Rule>> lines = new HashMap<Character, List<Rule>>();
+    private static void parseRules(final Scanner scanner, final String location,
+            final Map<Character, List<Rule>> ruleMapping, final Map<Character, Character> asciiFoldings) {
         int currentLine = 0;
+        boolean inMultilineComment = false;
 
         while (scanner.hasNextLine()) {
             currentLine++;
             final String rawLine = scanner.nextLine();
             String line = rawLine;
 
-            // discard comments
-            final int cmtI = line.indexOf(COMMENT);
-            if (cmtI >= 0) {
-                line = line.substring(0, cmtI);
+            if (inMultilineComment) {
+                if (line.endsWith(MULTILINE_COMMENT_END)) {
+                    inMultilineComment = false;
+                }
+                continue;
             }
 
-            // trim whitespace
-            line = line.trim();
-
-            if (line.length() == 0) {
-                continue; // empty lines can be safely skipped
-            }
-
-            // rule
-            final String[] parts = line.split("\\s+");
-            if (parts.length != 4) {
-                throw new IllegalArgumentException("Malformed rule statement split into " + parts.length +
-                        " parts: " + rawLine + " in " + location);
+            if (line.startsWith(MULTILINE_COMMENT_START)) {
+                inMultilineComment = true;
             } else {
-                try {
-                    final String pattern = stripQuotes(parts[0]);
-                    final String replacement1 = stripQuotes(parts[1]);
-                    final String replacement2 = stripQuotes(parts[2]);
-                    final String replacement3 = stripQuotes(parts[3]);
+                // discard comments
+                final int cmtI = line.indexOf(COMMENT);
+                if (cmtI >= 0) {
+                    line = line.substring(0, cmtI);
+                }
 
-                    final Rule r = new Rule(pattern, replacement1, replacement2, replacement3);
-                    final char patternKey = r.pattern.charAt(0);
-                    List<Rule> rules = lines.get(patternKey);
-                    if (rules == null) {
-                        rules = new ArrayList<Rule>();
-                        lines.put(patternKey, rules);
+                // trim leading-trailing whitespace
+                line = line.trim();
+
+                if (line.length() == 0) {
+                    continue; // empty lines can be safely skipped
+                }
+
+                if (line.contains("=")) {
+                    // folding
+                    final String[] parts = line.split("=");
+                    if (parts.length != 2) {
+                        throw new IllegalArgumentException("Malformed folding statement split into " + parts.length +
+                                " parts: " + rawLine + " in " + location);
                     }
-                    rules.add(r);
-                } catch (final IllegalArgumentException e) {
-                    throw new IllegalStateException("Problem parsing line '" + currentLine + "' in " + location, e);
+                    final String leftCharacter = parts[0];
+                    final String rightCharacter = parts[1];
+
+                    if (leftCharacter.length() != 1 || rightCharacter.length() != 1) {
+                        throw new IllegalArgumentException("Malformed folding statement - " +
+                                "patterns are not single characters: " + rawLine + " in " + location);
+                    }
+
+                    asciiFoldings.put(leftCharacter.charAt(0), rightCharacter.charAt(0));
+                } else {
+                    // rule
+                    final String[] parts = line.split("\\s+");
+                    if (parts.length != 4) {
+                        throw new IllegalArgumentException("Malformed rule statement split into " + parts.length +
+                                " parts: " + rawLine + " in " + location);
+                    }
+                    try {
+                        final String pattern = stripQuotes(parts[0]);
+                        final String replacement1 = stripQuotes(parts[1]);
+                        final String replacement2 = stripQuotes(parts[2]);
+                        final String replacement3 = stripQuotes(parts[3]);
+
+                        final Rule r = new Rule(pattern, replacement1, replacement2, replacement3);
+                        final char patternKey = r.pattern.charAt(0);
+                        List<Rule> rules = ruleMapping.get(patternKey);
+                        if (rules == null) {
+                            rules = new ArrayList<Rule>();
+                            ruleMapping.put(patternKey, rules);
+                        }
+                        rules.add(r);
+                    } catch (final IllegalArgumentException e) {
+                        throw new IllegalStateException(
+                                "Problem parsing line '" + currentLine + "' in " + location, e);
+                    }
                 }
             }
         }
-
-        return lines;
     }
 
     private static String stripQuotes(String str) {
@@ -190,8 +187,8 @@ public class DMSoundex implements StringEncoder {
             }
 
             ch = Character.toLowerCase(ch);
-            if (TRANSLATION.containsKey(ch)) {
-                ch = TRANSLATION.get(ch);
+            if (FOLDINGS.containsKey(ch)) {
+                ch = FOLDINGS.get(ch);
             }
             sb.append(ch);
         }
