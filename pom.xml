@@ -22,7 +22,7 @@ limitations under the License.
   <groupId>org.netomi</groupId>
   <artifactId>dm-soundex</artifactId>
   <name>Daitch-Mokotoff Soundex</name>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.4</version>
 
   <url>https://github.com/netomi/dm-soundex</url>
 
