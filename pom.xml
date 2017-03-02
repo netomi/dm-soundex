@@ -80,6 +80,12 @@ limitations under the License.
 
   <dependencies>
       <dependency>
+          <groupId>org.apache.lucene</groupId>
+          <artifactId>lucene-test-framework</artifactId>
+          <version>4.10.0</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
           <groupId>commons-codec</groupId>
           <artifactId>commons-codec</artifactId>
           <version>1.9</version>
@@ -100,12 +106,6 @@ limitations under the License.
           <version>1.9</version>
           <scope>test</scope>
           <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.lucene</groupId>
-          <artifactId>lucene-test-framework</artifactId>
-          <version>4.10.0</version>
-          <scope>test</scope>
       </dependency>
   </dependencies>
 </project>
